@@ -1,5 +1,6 @@
 package org.zlenko.backend.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,10 +10,12 @@ import org.zlenko.backend.dto.WorkTaskRequest;
 import org.zlenko.backend.entities.PriceTag;
 import org.zlenko.backend.entities.WorkStep;
 import org.zlenko.backend.entities.WorkTask;
+import org.zlenko.backend.entities.Worker;
 import org.zlenko.backend.enums.Status;
 import org.zlenko.backend.repositories.PriceTagRepository;
 import org.zlenko.backend.repositories.WorkStepRepository;
 import org.zlenko.backend.repositories.WorkTaskRepository;
+import org.zlenko.backend.repositories.WorkerRepository;
 
 import java.util.List;
 
@@ -22,6 +25,7 @@ public class WorkTaskService {
     private final WorkTaskRepository workTaskRepository;
     private final PriceTagRepository priceTagRepository;
     private final WorkStepRepository workStepRepository;
+    private final WorkerRepository workerRepository;
 
     public Page<WorkTask> getWorkTasks(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -50,6 +54,37 @@ public class WorkTaskService {
         task.setStatus(Status.PLANNED);
 
         return workTaskRepository.save(task);
+    }
+
+    //TODO: custom exception
+    @Transactional
+    public WorkTask assignWorkerToTask(Long workerId, Long workTaskId) {
+        WorkTask task = workTaskRepository.findById(workTaskId)
+                .orElseThrow(RuntimeException::new);
+        Worker worker = workerRepository.findById(workerId)
+                .orElseThrow(RuntimeException::new);
+
+        if (task.getStatus() == Status.CLOSED) {
+            throw new IllegalStateException("Cannot assign workers to a closed task");
+        }
+
+        if (task.getWorkers().contains(worker)) {
+            return task;
+        }
+
+        task.assignWorker(worker);
+        return task;
+    }
+
+    @Transactional
+    public WorkTask unassignWorkerFromTask(Long taskId, Long workerId) {
+        WorkTask task = workTaskRepository.findById(taskId)
+                .orElseThrow(RuntimeException::new);
+        Worker worker = workerRepository.findById(workerId)
+                .orElseThrow(RuntimeException::new);
+
+        task.unassignWorker(worker);
+        return task;
     }
 
 
