@@ -7,4 +7,6 @@ import org.zlenko.backend.entities.WorkTask;
 
 public interface WorkTaskRepository extends JpaRepository<WorkTask, Long> {
     Page<WorkTask> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<WorkTask> findByWorkers_Id(Long workerId, Pageable pageable);
+    Page<WorkTask> findByWorkers_IdAndNameContainingIgnoreCase(Long workerId, String name, Pageable pageable);
 }

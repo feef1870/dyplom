@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.zlenko.backend.dto.OrderRequest;
 import org.zlenko.backend.entities.Client;
 import org.zlenko.backend.entities.Order;
+import org.zlenko.backend.enums.Status;
 import org.zlenko.backend.repositories.ClientRepository;
 import org.zlenko.backend.repositories.OrderRepository;
 
@@ -36,6 +37,7 @@ public class OrderService {
         order.setClient(client);
         order.setDescription(request.description());
         order.setName(request.name());
+        order.setStatus(Status.PLANNED);
 
         return orderRepository.save(order);
     }

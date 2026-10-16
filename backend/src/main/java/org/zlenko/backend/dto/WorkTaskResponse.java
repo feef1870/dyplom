@@ -1,5 +1,6 @@
 package org.zlenko.backend.dto;
 
+import org.zlenko.backend.entities.WorkTask;
 import org.zlenko.backend.enums.Status;
 
 import java.math.BigDecimal;
@@ -16,4 +17,17 @@ public record WorkTaskResponse(
         BigDecimal priceSnapshot,
         Long workStepId
 ) {
+    public static WorkTaskResponse from(WorkTask task) {
+        return new WorkTaskResponse(
+                task.getId(),
+                task.getName(),
+                task.getDescription(),
+                task.getStartDate(),
+                task.getEndDate(),
+                task.getStatus(),
+                task.getUnitQuantity(),
+                task.getPriceSnapshot(),
+                task.getWorkStep().getId()
+        );
+    }
 }
