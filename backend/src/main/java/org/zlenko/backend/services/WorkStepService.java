@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.zlenko.backend.dto.WorkStepRequest;
+import org.zlenko.backend.dto.WorkStepResponse;
 import org.zlenko.backend.entities.Order;
 import org.zlenko.backend.entities.WorkStep;
 import org.zlenko.backend.enums.Status;
@@ -18,18 +19,20 @@ public class WorkStepService {
     private final WorkStepRepository workStepRepository;
     private final OrderRepository orderRepository;
 
-    public Page<WorkStep> getWorkSteps(String search, int page, int size) {
+    public Page<WorkStepResponse> getWorkSteps(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         if (search == null || search.trim().isEmpty()) {
-            return workStepRepository.findAll(pageable);
+            return workStepRepository.findAll(pageable)
+                    .map(WorkStepResponse::from);
         }
 
-        return workStepRepository.findByNameContainingIgnoreCase(search, pageable);
+        return workStepRepository.findByNameContainingIgnoreCase(search, pageable)
+                .map(WorkStepResponse::from);
     }
 
     //TODO: custom exception
-    public WorkStep createWorkStep(WorkStepRequest request) {
+    public WorkStepResponse createWorkStep(WorkStepRequest request) {
         Order order = orderRepository.findById(request.orderId())
                 .orElseThrow(RuntimeException::new);
 
@@ -39,6 +42,6 @@ public class WorkStepService {
         step.setStatus(Status.PLANNED);
         step.setOrder(order);
 
-        return workStepRepository.save(step);
+        return WorkStepResponse.from(workStepRepository.save(step));
     }
 }
