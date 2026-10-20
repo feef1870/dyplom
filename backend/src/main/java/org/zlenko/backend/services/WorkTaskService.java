@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zlenko.backend.dto.WorkTaskRequest;
@@ -30,7 +31,9 @@ public class WorkTaskService {
     private final WorkerRepository workerRepository;
 
     @Transactional(readOnly = true)
-    public Page<WorkTaskResponse> getWorkTasks(String keycloakId, Authentication authentication, String search, int page, int size) {
+    public Page<WorkTaskResponse> getWorkTasks(Authentication authentication, String search, int page, int size) {
+        String keycloakId = ((Jwt) authentication.getPrincipal()).getSubject();
+
         Pageable pageable = PageRequest.of(page, Math.min(size, 100));
         boolean hasSearch = search != null && !search.trim().isEmpty();
         boolean isManager = authentication.getAuthorities().stream()

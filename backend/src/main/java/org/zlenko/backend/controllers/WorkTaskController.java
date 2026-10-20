@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.zlenko.backend.dto.WorkTaskRequest;
 import org.zlenko.backend.dto.WorkTaskResponse;
@@ -20,13 +18,12 @@ public class WorkTaskController {
 
     @GetMapping
     public Page<WorkTaskResponse> getWorkTasks(
-            @AuthenticationPrincipal Jwt jwt,
             Authentication authentication,
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        return workTaskService.getWorkTasks(jwt.getSubject(), authentication, search, page, size);
+        return workTaskService.getWorkTasks(authentication, search, page, size);
     }
 
     @PostMapping
