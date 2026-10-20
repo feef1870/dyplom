@@ -23,7 +23,7 @@ public class PriceTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     @NotBlank(message = "(price_tags) name is null or blank")
     private String name;
 
@@ -35,6 +35,5 @@ public class PriceTag {
 
     @Column(name = "is_active", nullable = false)
     @NotNull(message = "(price_tags) is active is null")
-    @ColumnDefault("true")
     private Boolean isActive;
 }

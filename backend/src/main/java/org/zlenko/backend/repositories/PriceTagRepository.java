@@ -7,4 +7,5 @@ import org.zlenko.backend.entities.PriceTag;
 
 public interface PriceTagRepository extends JpaRepository<PriceTag, Long> {
     Page<PriceTag> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    boolean existsByNameIgnoreCase(String name);
 }

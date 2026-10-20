@@ -31,7 +31,7 @@ public class Client {
     @Length(max = 20)
     private String phone;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false)
     @NotBlank(message = "(clients) email is null or blank")
     @Email
     private String email;

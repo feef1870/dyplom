@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zlenko.backend.dto.PriceTagRequest;
 import org.zlenko.backend.dto.PriceTagResponse;
+import org.zlenko.backend.dto.UpdatePriceTagRequest;
 import org.zlenko.backend.entities.PriceTag;
 import org.zlenko.backend.repositories.PriceTagRepository;
 
@@ -33,10 +34,47 @@ public class PriceTagService {
 
     @Transactional
     @PreAuthorize("hasRole('manager')")
-    public PriceTagResponse createNewPriceTag(PriceTagRequest request) {
+    public PriceTagResponse createPriceTag(PriceTagRequest request) {
+        if (priceTagRepository.existsByNameIgnoreCase(request.name())) {
+            throw new RuntimeException(); //TODO: custom exception
+        }
+
         PriceTag priceTag = new PriceTag();
         priceTag.setName(request.name());
         priceTag.setUnitPrice(request.unitPrice());
+        priceTag.setIsActive(true);
         return PriceTagResponse.from(priceTagRepository.save(priceTag));
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public PriceTagResponse updatePriceTag(Long id, UpdatePriceTagRequest request) {
+        PriceTag priceTag = priceTagRepository.findById(id)
+                .orElseThrow(RuntimeException::new); //TODO: custom exception
+
+        if (request.name() != null && !request.name().equalsIgnoreCase(priceTag.getName()) && priceTagRepository.existsByNameIgnoreCase(request.name())) {
+            throw new RuntimeException(); //TODO: custom exception
+        }
+
+        if (request.name() != null) {
+            priceTag.setName(request.name());
+        }
+        if (request.unitPrice() != null) {
+            priceTag.setUnitPrice(request.unitPrice());
+        }
+        if (request.isActive() != null) {
+            priceTag.setIsActive(request.isActive());
+        }
+
+        return PriceTagResponse.from(priceTag);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public void deletePriceTag(Long id) {
+        PriceTag priceTag = priceTagRepository.findById(id)
+                .orElseThrow(RuntimeException::new); //TODO: custom exception
+
+        priceTag.setIsActive(false);
     }
 }
