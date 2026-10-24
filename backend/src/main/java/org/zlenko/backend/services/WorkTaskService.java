@@ -1,6 +1,7 @@
 package org.zlenko.backend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.zlenko.backend.entities.WorkStep;
 import org.zlenko.backend.entities.WorkTask;
 import org.zlenko.backend.entities.Worker;
 import org.zlenko.backend.enums.Status;
+import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.PriceTagRepository;
 import org.zlenko.backend.repositories.WorkStepRepository;
 import org.zlenko.backend.repositories.WorkTaskRepository;
@@ -48,7 +50,7 @@ public class WorkTaskService {
         }
 
         Worker worker = workerRepository.findByKeycloakId(keycloakId)
-                .orElseThrow(RuntimeException::new);   //TODO: custom exception
+                .orElseThrow(() -> new NotFoundException("Worker", keycloakId));
 
         return hasSearch
                 ? workTaskRepository.findByWorkers_IdAndNameContainingIgnoreCase(worker.getId(), search, pageable)
@@ -57,14 +59,13 @@ public class WorkTaskService {
                 .map(WorkTaskResponse::from);
     }
 
-    //TODO: create custom exception for "resource not found"
     @Transactional
     @PreAuthorize("hasRole('manager')")
     public WorkTaskResponse createWorkTask(WorkTaskRequest request) {
         PriceTag priceTag = priceTagRepository.findById(request.priceTagId())
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new NotFoundException("PriceTag", request.priceTagId()));
         WorkStep workStep = workStepRepository.findById(request.workStepId())
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new NotFoundException("WorkStep", request.workStepId()));
 
         WorkTask task = new WorkTask();
         task.setName(request.name());
@@ -78,14 +79,13 @@ public class WorkTaskService {
         return WorkTaskResponse.from(workTaskRepository.save(task));
     }
 
-    //TODO: custom exception
     @Transactional
     @PreAuthorize("hasRole('manager')")
     public WorkTaskResponse assignWorkerToTask(Long taskId, Long workerId) {
         WorkTask task = workTaskRepository.findById(taskId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new NotFoundException("Task", taskId));
         Worker worker = workerRepository.findById(workerId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new NotFoundException("Worker", workerId));
 
         if (task.getStatus() == Status.CLOSED) {
             throw new IllegalStateException("Cannot assign workers to a closed task");
@@ -103,9 +103,9 @@ public class WorkTaskService {
     @PreAuthorize("hasRole('manager')")
     public WorkTaskResponse unassignWorkerFromTask(Long taskId, Long workerId) {
         WorkTask task = workTaskRepository.findById(taskId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new NotFoundException("Task", taskId));
         Worker worker = workerRepository.findById(workerId)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new NotFoundException("Worker", workerId));
 
         if (task.getStatus() == Status.CLOSED) {
             throw new IllegalStateException("Cannot unassign workers from a closed task");

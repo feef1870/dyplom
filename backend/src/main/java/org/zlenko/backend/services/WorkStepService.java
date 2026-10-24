@@ -10,6 +10,7 @@ import org.zlenko.backend.dto.WorkStepResponse;
 import org.zlenko.backend.entities.Order;
 import org.zlenko.backend.entities.WorkStep;
 import org.zlenko.backend.enums.Status;
+import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.OrderRepository;
 import org.zlenko.backend.repositories.WorkStepRepository;
 
@@ -31,10 +32,9 @@ public class WorkStepService {
                 .map(WorkStepResponse::from);
     }
 
-    //TODO: custom exception
     public WorkStepResponse createWorkStep(WorkStepRequest request) {
         Order order = orderRepository.findById(request.orderId())
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new NotFoundException("Order", request.orderId()));
 
         WorkStep step = new WorkStep();
         step.setName(request.name());

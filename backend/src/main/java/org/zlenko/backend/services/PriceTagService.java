@@ -11,6 +11,8 @@ import org.zlenko.backend.dto.PriceTagRequest;
 import org.zlenko.backend.dto.PriceTagResponse;
 import org.zlenko.backend.dto.UpdatePriceTagRequest;
 import org.zlenko.backend.entities.PriceTag;
+import org.zlenko.backend.exceptions.ConflictException;
+import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.PriceTagRepository;
 
 @Service
@@ -36,7 +38,7 @@ public class PriceTagService {
     @PreAuthorize("hasRole('manager')")
     public PriceTagResponse createPriceTag(PriceTagRequest request) {
         if (priceTagRepository.existsByNameIgnoreCase(request.name())) {
-            throw new RuntimeException(); //TODO: custom exception
+            throw new ConflictException("Price tag with name '" + request.name() + "' already exists");
         }
 
         PriceTag priceTag = new PriceTag();
@@ -50,10 +52,10 @@ public class PriceTagService {
     @PreAuthorize("hasRole('manager')")
     public PriceTagResponse updatePriceTag(Long id, UpdatePriceTagRequest request) {
         PriceTag priceTag = priceTagRepository.findById(id)
-                .orElseThrow(RuntimeException::new); //TODO: custom exception
+                .orElseThrow(() -> new NotFoundException("Price tag", id));
 
         if (request.name() != null && !request.name().equalsIgnoreCase(priceTag.getName()) && priceTagRepository.existsByNameIgnoreCase(request.name())) {
-            throw new RuntimeException(); //TODO: custom exception
+            throw new ConflictException("Price tag with name '" + request.name() + "' already exists");
         }
 
         if (request.name() != null) {
@@ -73,7 +75,7 @@ public class PriceTagService {
     @PreAuthorize("hasRole('manager')")
     public void deletePriceTag(Long id) {
         PriceTag priceTag = priceTagRepository.findById(id)
-                .orElseThrow(RuntimeException::new); //TODO: custom exception
+                .orElseThrow(() -> new NotFoundException("Price tag", id));
 
         priceTag.setIsActive(false);
     }

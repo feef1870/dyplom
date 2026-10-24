@@ -10,6 +10,7 @@ import org.zlenko.backend.dto.OrderResponse;
 import org.zlenko.backend.entities.Client;
 import org.zlenko.backend.entities.Order;
 import org.zlenko.backend.enums.Status;
+import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.ClientRepository;
 import org.zlenko.backend.repositories.OrderRepository;
 
@@ -31,10 +32,9 @@ public class OrderService {
                 .map(OrderResponse::from);
     }
 
-    //TODO: custom exception
     public OrderResponse createOrder(OrderRequest request) {
         Client client = clientRepository.findById(request.clientId())
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new NotFoundException("Client", request.clientId()));
 
         Order order = new Order();
         order.setClient(client);
