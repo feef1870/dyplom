@@ -35,6 +35,5 @@ public class PriceTag {
 
     @Column(name = "is_active", nullable = false)
     @NotNull(message = "(price_tags) is active is null")
-    @ColumnDefault("true")
     private Boolean isActive;
 }

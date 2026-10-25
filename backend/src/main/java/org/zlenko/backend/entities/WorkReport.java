@@ -43,6 +43,11 @@ public class WorkReport {
     @JoinColumn(name = "work_step_id")
     private WorkStep workStep;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    @NotNull(message = "(work reports) author id is null")
+    private Worker author;
+
     @AssertTrue(message = "(work reports) exactly one of work task/work step must be set")
     public boolean isExactlyOneReportTarget() {
         return (workTask != null) ^ (workStep != null);

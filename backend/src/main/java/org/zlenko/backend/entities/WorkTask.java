@@ -70,4 +70,14 @@ public class WorkTask {
 
     @ManyToMany(mappedBy = "workTasks")
     private Set<Worker> workers = new HashSet<>();
+
+    public void assignWorker(Worker worker) {
+        workers.add(worker);
+        worker.getWorkTasks().add(this);
+    }
+
+    public void unassignWorker(Worker worker) {
+        workers.remove(worker);
+        worker.getWorkTasks().remove(this);
+    }
 }

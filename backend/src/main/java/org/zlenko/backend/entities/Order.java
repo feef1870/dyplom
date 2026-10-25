@@ -1,6 +1,7 @@
 package org.zlenko.backend.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,10 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false)
+    @NotBlank(message = "(orders) name is null or blank")
+    private String name;
+
     @Column(name = "description")
     private String description;
 
@@ -35,4 +40,9 @@ public class Order {
     @Column(name = "status", nullable = false, columnDefinition = "status")
     @NotNull(message = "(orders) status is null")
     private Status status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
+    @NotNull(message = "(orders) client id is null")
+    private Client client;
 }
