@@ -21,32 +21,32 @@ public class WorkTaskController {
             Authentication authentication,
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
+            @RequestParam(defaultValue = "10") int size
+    ) {
         return workTaskService.getWorkTasks(authentication, search, page, size);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public WorkTaskResponse createWorkTask(
-            @Valid @RequestBody WorkTaskRequest request) {
-
+            @Valid @RequestBody WorkTaskRequest request
+    ) {
         return workTaskService.createWorkTask(request);
     }
 
     @DeleteMapping("/{taskId}/workers/{workerId}")
     public WorkTaskResponse unassignWorkerFromTask(
             @PathVariable("taskId") Long taskId,
-            @PathVariable("workerId") Long workerId) {
-
+            @PathVariable("workerId") Long workerId
+    ) {
         return workTaskService.unassignWorkerFromTask(taskId, workerId);
     }
 
     @PutMapping("/{taskId}/workers/{workerId}")
     public WorkTaskResponse assignWorkerToTask(
             @PathVariable("taskId") Long taskId,
-            @PathVariable("workerId") Long workerId) {
-
+            @PathVariable("workerId") Long workerId
+    ) {
         return workTaskService.assignWorkerToTask(taskId, workerId);
     }
 

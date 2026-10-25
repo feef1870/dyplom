@@ -20,32 +20,32 @@ public class PriceTagController {
     public Page<PriceTagResponse> getPriceTags(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
+            @RequestParam(defaultValue = "10") int size
+    ) {
         return priceTagService.getPriceTags(search, page, size);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PriceTagResponse createPriceTag(
-            @Valid @RequestBody PriceTagRequest request) {
-
+            @Valid @RequestBody PriceTagRequest request
+    ) {
         return priceTagService.createPriceTag(request);
     }
 
     @PatchMapping("/{id}")
     public PriceTagResponse updatePriceTag(
             @PathVariable Long id,
-            @Valid @RequestBody UpdatePriceTagRequest request) {
-
+            @Valid @RequestBody UpdatePriceTagRequest request
+    ) {
         return priceTagService.updatePriceTag(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePriceTag(
-            @PathVariable Long id) {
-
+            @PathVariable Long id
+    ) {
         priceTagService.deletePriceTag(id);
     }
 }
