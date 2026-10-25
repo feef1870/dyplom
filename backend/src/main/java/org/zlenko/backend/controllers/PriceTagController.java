@@ -12,7 +12,7 @@ import org.zlenko.backend.services.PriceTagService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/pricetags")
+@RequestMapping("/api/price-tags")
 public class PriceTagController {
     private final PriceTagService priceTagService;
 
