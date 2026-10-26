@@ -471,6 +471,66 @@
     }
   },
   "groups": [],
+  "users": [
+    {
+      "id": "01de7252-091a-4c94-8a6e-295ac2ab0dcb",
+      "createdTimestamp": 1735689600000,
+      "username": "manager",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "firstName": "Manager",
+      "lastName": "User",
+      "email": "manager@dyplom.local",
+      "credentials": [
+        {
+          "id": "9addc40d-c783-4ab2-85d0-da750fd66360",
+          "type": "password",
+          "createdDate": 1735689600000,
+          "secretData": "{\"value\":\"SJLxQZijhk9cxH68WBBIpKyTufgXjAeVFrKiJgiUjMI=\",\"salt\":\"8uyBjnf5H1BApdq8WuCkxw==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":600000,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-dyplom",
+        "manager"
+      ],
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "7d8e86cc-a4ff-4cd9-b297-c1fd2cc519ce",
+      "createdTimestamp": 1735689600000,
+      "username": "worker",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "firstName": "Worker",
+      "lastName": "User",
+      "email": "worker@dyplom.local",
+      "credentials": [
+        {
+          "id": "d8b6e710-5f9f-4ebb-a6e4-3a359a0d293b",
+          "type": "password",
+          "createdDate": 1735689600000,
+          "secretData": "{\"value\":\"lSY55BuNjtf7AJThgQawyeW068Y5Th+m9RQ/Dvspmd4=\",\"salt\":\"Xap6CUo/841GPJ3cl64CMg==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":600000,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}",
+          "temporary": false
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "default-roles-dyplom",
+        "worker"
+      ],
+      "notBefore": 0,
+      "groups": []
+    }
+  ],
   "defaultRole": {
     "id": "da15ad38-1d72-4468-b1c3-3482d4899d63",
     "name": "default-roles-dyplom",
@@ -752,10 +812,11 @@
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://localhost:5173/*"
+        "http://localhost:4200",
+        "http://localhost:4200/*"
       ],
       "webOrigins": [
-        "http://localhost:5173"
+        "http://localhost:4200"
       ],
       "notBefore": 0,
       "bearerOnly": false,
