@@ -1,23 +1,20 @@
-import { Component, inject, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { Api } from './api';
+import { Worker } from '../models/worker';
 import { HttpClient } from '@angular/common/http';
-import { Worker } from '../../models/worker';
-import { Api } from '../../services/api';
 
-@Component({
-  selector: 'app-home-page',
-  imports: [],
-  templateUrl: './home-page.html',
-  styleUrl: './home-page.scss',
+@Injectable({
+  providedIn: 'root',
 })
-export class HomePage {
+export class Auth {
   private readonly oidc = inject(OidcSecurityService);
   private readonly api = inject(Api);
 
   worker = signal<Worker | undefined>(undefined);
   roles = signal<string[]>([]);
 
-  ngOnInit(): void {
+  constructor() {
     this.api.me().subscribe((worker) => {
       this.worker.set(worker);
     });

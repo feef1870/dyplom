@@ -1,0 +1,14 @@
+<nav>
+  <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+
+  <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+
+  @if (auth.hasRole('manager')) {
+    <a routerLink="/orders" routerLinkActive="active">Orders</a>
+    <a routerLink="/price-tags" routerLinkActive="active">Price tags</a>
+  }
+
+  <span class="spacer"></span>
+  <span>Hello, {{ auth.worker()?.firstName ?? '…' }}</span>
+  <button (click)="auth.logout()">Log out</button>
+</nav>

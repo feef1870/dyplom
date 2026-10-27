@@ -18,5 +18,5 @@ export const authConfig = {
 
   secureRoutes: ['http://localhost:8080/api/'],
 
-  logLevel: LogLevel.Debug,
+  logLevel: LogLevel.Warn,
 };
