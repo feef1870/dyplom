@@ -1,1 +1,63 @@
-<p>price-tags-page works!</p>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <h2>{{ editingId() === undefined ? 'Create price tag' : 'Edit price tag' }}</h2>
+
+  <input type="text" placeholder="Name" formControlName="name" />
+  <input type="number" placeholder="Unit price" formControlName="unitPrice" />
+
+  <button type="submit" [disabled]="submitting()">
+    {{ editingId() === undefined ? 'Create' : 'Save' }}
+  </button>
+
+  @if (editingId() !== undefined) {
+    <button type="button" (click)="cancelEdit()">Cancel</button>
+  }
+</form>
+
+@if (form.controls.name.touched && form.controls.name.invalid) {
+  <p class="error">Name is required.</p>
+}
+@if (form.controls.unitPrice.touched && form.controls.unitPrice.invalid) {
+  <p class="error">Unit price is required and must be 0 or more.</p>
+}
+@if (formError()) {
+  <p class="error">{{ formError() }}</p>
+}
+
+<hr />
+
+<input
+  type="text"
+  placeholder="Search"
+  [(ngModel)]="searchString"
+  (keyup.enter)="search()"
+/>
+<button (click)="search()">Search</button>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (priceTags().length === 0) {
+  <p>No price tags found.</p>
+} @else {
+  @for (priceTag of priceTags(); track priceTag.id) {
+    <div class="price-tag-row">
+      <app-price-tag-card [priceTag]="priceTag" />
+
+      <button (click)="startEdit(priceTag)">Edit</button>
+      <button (click)="toggleActive(priceTag)">
+        {{ priceTag.isActive ? 'Deactivate' : 'Activate' }}
+      </button>
+    </div>
+  }
+}
+
+@if (totalPages() > 0) {
+  <div class="pagination">
+    <button (click)="prev()" [disabled]="currentPage() === 0">‹ Prev</button>
+    <span>Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+    <button (click)="next()" [disabled]="currentPage() >= totalPages() - 1">
+      Next ›
+    </button>
+  </div>
+}

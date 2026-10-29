@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zlenko.backend.dto.PriceTagRequest;
 import org.zlenko.backend.dto.PriceTagResponse;
-import org.zlenko.backend.dto.UpdatePriceTagRequest;
 import org.zlenko.backend.entities.PriceTag;
 import org.zlenko.backend.exceptions.ConflictException;
 import org.zlenko.backend.exceptions.NotFoundException;
@@ -22,15 +21,23 @@ public class PriceTagService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('manager')")
-    public Page<PriceTagResponse> getPriceTags(String search, int page, int size) {
+    public Page<PriceTagResponse> getPriceTags(String search, int page, int size, Boolean active) {
         Pageable pageable = PageRequest.of(page, size);
+        boolean hasSearch = search != null && !search.trim().isEmpty();
 
-        if (search == null || search.trim().isEmpty()) {
-            return priceTagRepository.findAll(pageable)
+        if (hasSearch && active != null) {
+            return priceTagRepository.findByNameContainingIgnoreCaseAndIsActive(search, active, pageable)
                     .map(PriceTagResponse::from);
         }
-
-        return priceTagRepository.findByNameContainingIgnoreCase(search, pageable)
+        if (hasSearch) {
+            return priceTagRepository.findByNameContainingIgnoreCase(search, pageable)
+                    .map(PriceTagResponse::from);
+        }
+        if (active != null) {
+            return priceTagRepository.findByIsActive(active, pageable)
+                    .map(PriceTagResponse::from);
+        }
+        return priceTagRepository.findAll(pageable)
                 .map(PriceTagResponse::from);
     }
 
@@ -50,33 +57,39 @@ public class PriceTagService {
 
     @Transactional
     @PreAuthorize("hasRole('manager')")
-    public PriceTagResponse updatePriceTag(Long id, UpdatePriceTagRequest request) {
+    public PriceTagResponse updatePriceTag(Long id, PriceTagRequest request) {
         PriceTag priceTag = priceTagRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Price tag", id));
 
-        if (request.name() != null && !request.name().equalsIgnoreCase(priceTag.getName()) && priceTagRepository.existsByNameIgnoreCase(request.name())) {
+        if (!request.name().equalsIgnoreCase(priceTag.getName())
+                && priceTagRepository.existsByNameIgnoreCase(request.name())) {
             throw new ConflictException("Price tag with name '" + request.name() + "' already exists");
         }
 
-        if (request.name() != null) {
-            priceTag.setName(request.name());
-        }
-        if (request.unitPrice() != null) {
-            priceTag.setUnitPrice(request.unitPrice());
-        }
-        if (request.isActive() != null) {
-            priceTag.setIsActive(request.isActive());
-        }
+        priceTag.setName(request.name());
+        priceTag.setUnitPrice(request.unitPrice());
 
         return PriceTagResponse.from(priceTag);
     }
 
     @Transactional
     @PreAuthorize("hasRole('manager')")
-    public void deletePriceTag(Long id) {
+    public PriceTagResponse activate(Long id) {
+        return setActive(id, true);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public PriceTagResponse deactivate(Long id) {
+        return setActive(id, false);
+    }
+
+    private PriceTagResponse setActive(Long id, boolean active) {
         PriceTag priceTag = priceTagRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Price tag", id));
 
-        priceTag.setIsActive(false);
+        priceTag.setIsActive(active);
+
+        return PriceTagResponse.from(priceTag);
     }
 }

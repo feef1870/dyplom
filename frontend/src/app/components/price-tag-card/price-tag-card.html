@@ -1,0 +1,8 @@
+<div [class.disabled]="!priceTag().isActive">
+  <h3>
+    {{ priceTag().name }}
+  </h3>
+  <p>
+    {{ priceTag().unitPrice | currency }} per unit
+  </p>
+</div>

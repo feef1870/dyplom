@@ -82,9 +82,3 @@ export interface PriceTagRequest {
   name: string;
   unitPrice: number;
 }
-
-export interface UpdatePriceTagRequest {
-  name?: string;
-  unitPrice?: number;
-  isActive?: boolean;
-}

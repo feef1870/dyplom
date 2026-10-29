@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.zlenko.backend.dto.PriceTagRequest;
 import org.zlenko.backend.dto.PriceTagResponse;
-import org.zlenko.backend.dto.UpdatePriceTagRequest;
 import org.zlenko.backend.services.PriceTagService;
 
 @RestController
@@ -20,9 +19,10 @@ public class PriceTagController {
     public Page<PriceTagResponse> getPriceTags(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Boolean active
     ) {
-        return priceTagService.getPriceTags(search, page, size);
+        return priceTagService.getPriceTags(search, page, size, active);
     }
 
     @PostMapping
@@ -33,19 +33,21 @@ public class PriceTagController {
         return priceTagService.createPriceTag(request);
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public PriceTagResponse updatePriceTag(
             @PathVariable Long id,
-            @Valid @RequestBody UpdatePriceTagRequest request
+            @Valid @RequestBody PriceTagRequest request
     ) {
         return priceTagService.updatePriceTag(id, request);
     }
 
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePriceTag(
-            @PathVariable Long id
-    ) {
-        priceTagService.deletePriceTag(id);
+    @PostMapping("/{id}/activate")
+    public PriceTagResponse activatePriceTag(@PathVariable Long id) {
+        return priceTagService.activate(id);
+    }
+
+    @PostMapping("/{id}/deactivate")
+    public PriceTagResponse deactivatePriceTag(@PathVariable Long id) {
+        return priceTagService.deactivate(id);
     }
 }

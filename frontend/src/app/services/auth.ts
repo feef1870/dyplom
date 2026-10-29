@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { OidcSecurityService } from 'angular-auth-oidc-client';
 import { Api } from './api';
-import { Worker } from '../models/worker';
+import { Worker } from '../models/models';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({

@@ -9,11 +9,10 @@ import {
   PriceTagRequest,
   Task,
   TaskRequest,
-  UpdatePriceTagRequest,
-  Worker,
   WorkStep,
   WorkStepRequest,
-} from '../models/worker';
+  Worker,
+} from '../models/models';
 
 const BASE_URL = 'http://localhost:8080/api';
 
@@ -65,22 +64,28 @@ export class Api {
     return this.http.post<WorkStep>(`${BASE_URL}/steps`, body);
   }
 
-  getPriceTags(search = '', page = 0, size = 10): Observable<Page<PriceTag>> {
-    return this.http.get<Page<PriceTag>>(`${BASE_URL}/price-tags`, {
-      params: this.pageParams(search, page, size),
-    });
+  getPriceTags(search = '', page = 0, size = 10, active?: boolean): Observable<Page<PriceTag>> {
+    let params = this.pageParams(search, page, size);
+    if (active !== undefined) {
+      params = params.set('active', String(active));
+    }
+    return this.http.get<Page<PriceTag>>(`${BASE_URL}/price-tags`, { params });
   }
 
   createPriceTag(body: PriceTagRequest): Observable<PriceTag> {
     return this.http.post<PriceTag>(`${BASE_URL}/price-tags`, body);
   }
 
-  updatePriceTag(id: number, body: UpdatePriceTagRequest): Observable<PriceTag> {
-    return this.http.patch<PriceTag>(`${BASE_URL}/price-tags/${id}`, body);
+  updatePriceTag(id: number, body: PriceTagRequest): Observable<PriceTag> {
+    return this.http.put<PriceTag>(`${BASE_URL}/price-tags/${id}`, body);
   }
 
-  deletePriceTag(id: number): Observable<void> {
-    return this.http.delete<void>(`${BASE_URL}/price-tags/${id}`);
+  activatePriceTag(id: number): Observable<PriceTag> {
+    return this.http.post<PriceTag>(`${BASE_URL}/price-tags/${id}/activate`, null);
+  }
+
+  deactivatePriceTag(id: number): Observable<PriceTag> {
+    return this.http.post<PriceTag>(`${BASE_URL}/price-tags/${id}/deactivate`, null);
   }
 
   private pageParams(search: string, page: number, size: number): HttpParams {
