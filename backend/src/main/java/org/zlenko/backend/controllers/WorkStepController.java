@@ -19,9 +19,10 @@ public class WorkStepController {
     public Page<WorkStepResponse> getWorkSteps(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long orderId
     ) {
-        return workStepService.getWorkSteps(search, page, size);
+        return workStepService.getWorkSteps(search, page, size, orderId);
     }
 
     @PostMapping

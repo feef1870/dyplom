@@ -15,7 +15,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
                OR LOWER(c.email) LIKE LOWER(CONCAT('%', :search, '%'))
                OR c.phone LIKE CONCAT('%', :search, '%')
             """)
-    Page<Client> searchUsers(
+    Page<Client> searchClients(
             @Param("search") String search,
             Pageable pageable
     );

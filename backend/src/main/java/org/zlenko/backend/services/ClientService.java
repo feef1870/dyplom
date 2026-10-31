@@ -28,7 +28,7 @@ public class ClientService {
                     .map(ClientResponse::from);
         }
 
-        return clientRepository.searchUsers(search, pageable)
+        return clientRepository.searchClients(search, pageable)
                 .map(ClientResponse::from);
     }
 

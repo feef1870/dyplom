@@ -24,15 +24,23 @@ public class WorkStepService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('manager')")
-    public Page<WorkStepResponse> getWorkSteps(String search, int page, int size) {
+    public Page<WorkStepResponse> getWorkSteps(String search, int page, int size, Long orderId) {
         Pageable pageable = PageRequest.of(page, size);
+        boolean hasSearch = search != null && !search.trim().isEmpty();
 
-        if (search == null || search.trim().isEmpty()) {
-            return workStepRepository.findAll(pageable)
+        if (hasSearch && orderId != null) {
+            return workStepRepository.findByNameContainingIgnoreCaseAndOrder_Id(search, orderId, pageable)
                     .map(WorkStepResponse::from);
         }
-
-        return workStepRepository.findByNameContainingIgnoreCase(search, pageable)
+        if (hasSearch) {
+            return workStepRepository.findByNameContainingIgnoreCase(search, pageable)
+                    .map(WorkStepResponse::from);
+        }
+        if (orderId != null) {
+            return workStepRepository.findByOrder_Id(orderId, pageable)
+                    .map(WorkStepResponse::from);
+        }
+        return workStepRepository.findAll(pageable)
                 .map(WorkStepResponse::from);
     }
 
