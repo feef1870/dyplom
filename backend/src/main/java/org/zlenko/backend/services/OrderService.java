@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zlenko.backend.dto.OrderRequest;
 import org.zlenko.backend.dto.OrderResponse;
 import org.zlenko.backend.entities.Client;
@@ -20,6 +22,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
 
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('manager')")
     public Page<OrderResponse> getOrders(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -32,6 +36,8 @@ public class OrderService {
                 .map(OrderResponse::from);
     }
 
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
     public OrderResponse createOrder(OrderRequest request) {
         Client client = clientRepository.findById(request.clientId())
                 .orElseThrow(() -> new NotFoundException("Client", request.clientId()));

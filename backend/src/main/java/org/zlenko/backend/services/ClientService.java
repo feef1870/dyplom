@@ -18,7 +18,7 @@ import org.zlenko.backend.repositories.ClientRepository;
 public class ClientService {
     private final ClientRepository clientRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     @PreAuthorize("hasRole('manager')")
     public Page<ClientResponse> getClients(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
