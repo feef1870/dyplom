@@ -4,7 +4,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.zlenko.backend.entities.Order;
+import org.zlenko.backend.enums.Status;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Order> findByStatus(Status status, Pageable pageable);
+    Page<Order> findByNameContainingIgnoreCaseAndStatus(String name, Status status, Pageable pageable);
 }

@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.zlenko.backend.dto.OrderRequest;
 import org.zlenko.backend.dto.OrderResponse;
+import org.zlenko.backend.enums.Status;
 import org.zlenko.backend.services.OrderService;
 
 @RestController
@@ -19,9 +20,10 @@ public class OrderController {
     public Page<OrderResponse> getOrders(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Status status
     ) {
-        return orderService.getOrders(search, page, size);
+        return orderService.getOrders(search, page, size, status);
     }
 
     @PostMapping
@@ -30,5 +32,10 @@ public class OrderController {
             @Valid @RequestBody OrderRequest request
     ) {
         return orderService.createOrder(request);
+    }
+
+    @GetMapping("/{id}")
+    public OrderResponse getOrder(@PathVariable("id") Long id) {
+        return orderService.getOrder(id);
     }
 }

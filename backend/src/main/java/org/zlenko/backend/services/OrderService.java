@@ -24,15 +24,24 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('manager')")
-    public Page<OrderResponse> getOrders(String search, int page, int size) {
+    public Page<OrderResponse> getOrders(String search, int page, int size, Status status) {
         Pageable pageable = PageRequest.of(page, size);
+        boolean hasSearch = search != null && !search.trim().isEmpty();
 
-        if (search == null || search.trim().isEmpty()) {
-            return orderRepository.findAll(pageable)
+        if (hasSearch && status != null) {
+            return orderRepository.findByNameContainingIgnoreCaseAndStatus(search, status, pageable)
+                    .map(OrderResponse::from);
+        }
+        if (hasSearch) {
+            return orderRepository.findByNameContainingIgnoreCase(search, pageable)
+                    .map(OrderResponse::from);
+        }
+        if (status != null) {
+            return orderRepository.findByStatus(status, pageable)
                     .map(OrderResponse::from);
         }
 
-        return orderRepository.findByNameContainingIgnoreCase(search, pageable)
+        return orderRepository.findAll(pageable)
                 .map(OrderResponse::from);
     }
 
@@ -49,5 +58,13 @@ public class OrderService {
         order.setStatus(Status.PLANNED);
 
         return OrderResponse.from(orderRepository.save(order));
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('manager')")
+    public OrderResponse getOrder(Long id) {
+        return OrderResponse.from(orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order", id))
+        );
     }
 }
