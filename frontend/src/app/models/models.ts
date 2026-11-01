@@ -63,6 +63,8 @@ export interface Order {
   createdAt: string;
   status: Status;
   clientId: number;
+  clientFirstName: string;
+  clientLastName: string;
 }
 
 export interface OrderRequest {
@@ -81,4 +83,19 @@ export interface PriceTag {
 export interface PriceTagRequest {
   name: string;
   unitPrice: number;
+}
+
+export interface Client {
+  id: number;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+}
+
+export interface ClientRequest {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
 }
