@@ -24,4 +24,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/price-tags-page/price-tags-page').then((m) => m.PriceTagsPage),
   },
+  {
+    path: 'clients',
+    canActivate: [autoLoginPartialRoutesGuard, managerGuard],
+    loadComponent: () => import('./pages/clients-page/clients-page').then((m) => m.ClientsPage),
+  },
 ];

@@ -1,0 +1,65 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <h2>{{ editingId() === undefined ? 'Create client' : 'Edit client' }}</h2>
+
+  <input type="text" placeholder="First name" formControlName="firstName" />
+  <input type="text" placeholder="Last name" formControlName="lastName" />
+  <input type="text" placeholder="Phone" formControlName="phone" />
+  <input type="text" placeholder="Email" formControlName="email" />
+
+  <button type="submit" [disabled]="submitting()">
+    {{ editingId() === undefined ? 'Create' : 'Save' }}
+  </button>
+
+  @if (editingId() !== undefined) {
+    <button type="button" (click)="cancelEdit()">Cancel</button>
+  }
+</form>
+
+@if (form.controls.firstName.touched && form.controls.firstName.invalid) {
+  <p class="error">first name is required.</p>
+}
+@if (form.controls.lastName.touched && form.controls.lastName.invalid) {
+  <p class="error">Last name is required.</p>
+}
+@if (form.controls.email.touched && form.controls.email.invalid) {
+  <p class="error">Valid email is required.</p>
+}
+@if (formError()) {
+  <p class="error">{{ formError() }}</p>
+}
+
+<hr />
+
+<input
+  type="text"
+  placeholder="Search"
+  [(ngModel)]="searchString"
+  (keyup.enter)="search()"
+/>
+<button (click)="search()">Search</button>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (clients().length === 0) {
+  <p>No clients found</p>
+} @else {
+  @for (client of clients(); track client.id) {
+    <div class="client-row">
+      <app-client-card [client]="client" />
+
+      <button (click)="startEdit(client)">Edit</button>
+    </div>
+  }
+}
+
+@if (totalPages() > 0) {
+  <div class="pagination">
+    <button (click)="prev()" [disabled]="currentPage() === 0">‹ Prev</button>
+    <span>Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+    <button (click)="next()" [disabled]="currentPage() >= totalPages() - 1">
+      Next ›
+    </button>
+  </div>
+}
