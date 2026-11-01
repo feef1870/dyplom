@@ -96,6 +96,6 @@ export interface Client {
 export interface ClientRequest {
   firstName: string;
   lastName: string;
-  phone: string;
+  phone?: string;
   email: string;
 }
