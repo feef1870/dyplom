@@ -12,6 +12,9 @@ import {
   WorkStep,
   WorkStepRequest,
   Worker,
+  Client,
+  ClientRequest,
+  Status,
 } from '../models/models';
 
 const BASE_URL = 'http://localhost:8080/api';
@@ -44,20 +47,28 @@ export class Api {
     return this.http.delete<Task>(`${BASE_URL}/tasks/${taskId}/workers/${workerId}`);
   }
 
-  getOrders(search = '', page = 0, size = 10): Observable<Page<Order>> {
-    return this.http.get<Page<Order>>(`${BASE_URL}/orders`, {
-      params: this.pageParams(search, page, size),
-    });
+  getOrders(search = '', page = 0, size = 10, status?: Status): Observable<Page<Order>> {
+    let params = this.pageParams(search, page, size);
+    if (status !== undefined) {
+      params = params.set('status', String(status));
+    }
+    return this.http.get<Page<Order>>(`${BASE_URL}/orders`, { params });
+  }
+
+  getOrder(id: number): Observable<Order> {
+    return this.http.get<Order>(`${BASE_URL}/orders/${id}`);
   }
 
   createOrder(body: OrderRequest): Observable<Order> {
     return this.http.post<Order>(`${BASE_URL}/orders`, body);
   }
 
-  getSteps(search = '', page = 0, size = 10): Observable<Page<WorkStep>> {
-    return this.http.get<Page<WorkStep>>(`${BASE_URL}/steps`, {
-      params: this.pageParams(search, page, size),
-    });
+  getSteps(search = '', page = 0, size = 10, orderId?: number): Observable<Page<WorkStep>> {
+    let params = this.pageParams(search, page, size);
+    if (orderId !== undefined) {
+      params = params.set('orderId', String(orderId));
+    }
+    return this.http.get<Page<WorkStep>>(`${BASE_URL}/steps`, { params });
   }
 
   createStep(body: WorkStepRequest): Observable<WorkStep> {
@@ -86,6 +97,16 @@ export class Api {
 
   deactivatePriceTag(id: number): Observable<PriceTag> {
     return this.http.post<PriceTag>(`${BASE_URL}/price-tags/${id}/deactivate`, null);
+  }
+
+  getClients(search = '', page = 0, size = 10): Observable<Page<Client>> {
+    return this.http.get<Page<Client>>(`${BASE_URL}/clients`, {
+      params: this.pageParams(search, page, size),
+    });
+  }
+
+  createClient(body: ClientRequest): Observable<Client> {
+    return this.http.post<Client>(`${BASE_URL}/clients`, body);
   }
 
   private pageParams(search: string, page: number, size: number): HttpParams {
