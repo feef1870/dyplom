@@ -1,0 +1,26 @@
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (order(); as o) {
+  <h1>{{ o.name }}</h1>
+  <p>{{ o.description ?? 'No description.' }}</p>
+  <p>Status: {{ o.status }}</p>
+  <p>Client: {{ o.clientFirstName }} {{ o.clientLastName }}</p>
+  <p>Created: {{ o.createdAt | date }}</p>
+} @else {
+  <p>Loading order…</p>
+}
+
+<h2>Steps</h2>
+
+@if (steps().length === 0) {
+  <p>No steps yet.</p>
+} @else {
+  <ul>
+    @for (step of steps(); track step.id) {
+      <li>
+        <a [routerLink]="['/steps', step.id]">{{ step.name }}</a>
+        <span class="status">{{ step.status }}</span>
+      </li>
+    }
+  </ul>
+}
