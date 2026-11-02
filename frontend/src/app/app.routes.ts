@@ -29,4 +29,10 @@ export const routes: Routes = [
     canActivate: [autoLoginPartialRoutesGuard, managerGuard],
     loadComponent: () => import('./pages/clients-page/clients-page').then((m) => m.ClientsPage),
   },
+  {
+    path: 'orders/:id',
+    canActivate: [autoLoginPartialRoutesGuard, managerGuard],
+    loadComponent: () =>
+      import('./pages/order-detail-page/order-detail-page').then((m) => m.OrderDetailPage),
+  },
 ];

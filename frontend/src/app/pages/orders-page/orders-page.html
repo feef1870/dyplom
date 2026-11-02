@@ -1,1 +1,68 @@
-<p>orders-page works!</p>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <h2>Create order</h2>
+
+  <input type="text" placeholder="Name" formControlName="name" />
+  <input type="text" placeholder="Description" formControlName="description" />
+
+  <select formControlName="clientId">
+    <option [ngValue]="null" disabled>Select a client…</option>
+    @for (client of clients(); track client.id) {
+      <option [ngValue]="client.id">{{ client.firstName }} {{ client.lastName }}</option>
+    }
+  </select>
+
+  <button type="submit" [disabled]="submitting()">Create</button>
+</form>
+
+@if (form.controls.name.touched && form.controls.name.invalid) {
+  <p class="error">Name is required.</p>
+}
+@if (form.controls.clientId.touched && form.controls.clientId.invalid) {
+  <p class="error">A client is required.</p>
+}
+@if (formError()) {
+  <p class="error">{{ formError() }}</p>
+}
+
+<hr />
+
+<input
+  type="text"
+  placeholder="Search"
+  [(ngModel)]="searchString"
+  (keyup.enter)="search()"
+/>
+<button (click)="search()">Search</button>
+
+<select [(ngModel)]="statusFilter" (change)="search()">
+  <option value="">All statuses</option>
+  <option value="PLANNED">Planned</option>
+  <option value="IN_PROGRESS">In progress</option>
+  <option value="CLOSED">Closed</option>
+</select>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (orders().length === 0) {
+  <p>No orders found.</p>
+} @else {
+  @for (order of orders(); track order.id) {
+    <div class="order-row">
+      <a [routerLink]="['/orders', order.id]">{{ order.name }}</a>
+      <span class="status">{{ order.status }}</span>
+      <span>{{ order.clientFirstName }} {{ order.clientLastName }}</span>
+    </div>
+  }
+}
+
+@if (totalPages() > 0) {
+  <div class="pagination">
+    <button (click)="prev()" [disabled]="currentPage() === 0">‹ Prev</button>
+    <span>Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+    <button (click)="next()" [disabled]="currentPage() >= totalPages() - 1">
+      Next ›
+    </button>
+  </div>
+}
