@@ -23,7 +23,6 @@ public class WorkReport {
     private Long id;
 
     @Column(name = "created_at", nullable = false)
-    @NotNull(message = "(work reports) created at is null")
     @CreationTimestamp
     private Instant createdAt;
 

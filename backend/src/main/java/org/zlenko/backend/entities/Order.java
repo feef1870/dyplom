@@ -32,7 +32,6 @@ public class Order {
     private String description;
 
     @Column(name = "created_at", nullable = false)
-    @NotNull(message = "(orders) created_at is null")
     @CreationTimestamp
     private Instant createdAt;
 

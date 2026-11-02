@@ -37,7 +37,6 @@ public class WorkReportPhoto {
     private String contentType;
 
     @Column(name = "created_at", nullable = false)
-    @NotNull(message = "(work report photos) created at is null")
     @CreationTimestamp
     private Instant createdAt;
 }
