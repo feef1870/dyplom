@@ -21,9 +21,18 @@ public class WorkTaskController {
             Authentication authentication,
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) Long workStepId
     ) {
-        return workTaskService.getWorkTasks(authentication, search, page, size);
+        return workTaskService.getWorkTasks(authentication, search, page, size, workStepId);
+    }
+
+    @GetMapping("/{id}")
+    public WorkTaskResponse getWorkTask(
+            Authentication authentication,
+            @PathVariable("id") Long id
+    ) {
+        return workTaskService.getWorkTask(authentication, id);
     }
 
     @PostMapping

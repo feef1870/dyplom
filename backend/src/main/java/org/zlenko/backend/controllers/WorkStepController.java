@@ -25,6 +25,11 @@ public class WorkStepController {
         return workStepService.getWorkSteps(search, page, size, orderId);
     }
 
+    @GetMapping("/{id}")
+    public WorkStepResponse getWorkStep(@PathVariable("id") Long id) {
+        return workStepService.getWorkStep(id);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public WorkStepResponse createWorkStep(

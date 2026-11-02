@@ -44,6 +44,13 @@ public class WorkStepService {
                 .map(WorkStepResponse::from);
     }
 
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('manager')")
+    public WorkStepResponse getWorkStep(Long id) {
+        return WorkStepResponse.from(workStepRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("WorkStep", id)));
+    }
+
     @Transactional
     @PreAuthorize("hasRole('manager')")
     public WorkStepResponse createWorkStep(WorkStepRequest request) {

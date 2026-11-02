@@ -33,7 +33,7 @@ public class WorkTaskService {
     private final WorkerRepository workerRepository;
 
     @Transactional(readOnly = true)
-    public Page<WorkTaskResponse> getWorkTasks(Authentication authentication, String search, int page, int size) {
+    public Page<WorkTaskResponse> getWorkTasks(Authentication authentication, String search, int page, int size, Long workStepId) {
         String keycloakId = ((Jwt) authentication.getPrincipal()).getSubject();
 
         Pageable pageable = PageRequest.of(page, Math.min(size, 100));
@@ -42,21 +42,59 @@ public class WorkTaskService {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_manager"));
 
         if (isManager) {
-            return hasSearch
-                    ? workTaskRepository.findByNameContainingIgnoreCase(search, pageable)
-                    .map(WorkTaskResponse::from)
-                    : workTaskRepository.findAll(pageable)
+            if (hasSearch && workStepId != null) {
+                return workTaskRepository.findByNameContainingIgnoreCaseAndWorkStep_Id(search, workStepId, pageable)
+                        .map(WorkTaskResponse::from);
+            }
+            if (hasSearch) {
+                return workTaskRepository.findByNameContainingIgnoreCase(search, pageable)
+                        .map(WorkTaskResponse::from);
+            }
+            if (workStepId != null) {
+                return workTaskRepository.findByWorkStep_Id(workStepId, pageable)
+                        .map(WorkTaskResponse::from);
+            }
+            return workTaskRepository.findAll(pageable)
                     .map(WorkTaskResponse::from);
         }
 
         Worker worker = workerRepository.findByKeycloakId(keycloakId)
                 .orElseThrow(() -> new NotFoundException("Worker", keycloakId));
 
-        return hasSearch
-                ? workTaskRepository.findByWorkers_IdAndNameContainingIgnoreCase(worker.getId(), search, pageable)
-                .map(WorkTaskResponse::from)
-                : workTaskRepository.findByWorkers_Id(worker.getId(), pageable)
+        if (hasSearch && workStepId != null) {
+            return workTaskRepository.findByWorkers_IdAndWorkStep_IdAndNameContainingIgnoreCase(worker.getId(), search, workStepId, pageable)
+                    .map(WorkTaskResponse::from);
+        }
+        if (hasSearch) {
+            return workTaskRepository.findByWorkers_IdAndNameContainingIgnoreCase(worker.getId(), search, pageable)
+                    .map(WorkTaskResponse::from);
+        }
+        if (workStepId != null) {
+            return workTaskRepository.findByWorkers_IdAndWorkStep_Id(worker.getId(), workStepId, pageable)
+                    .map(WorkTaskResponse::from);
+        }
+        return workTaskRepository.findByWorkers_Id(worker.getId(), pageable)
                 .map(WorkTaskResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public WorkTaskResponse getWorkTask(Authentication authentication, Long id) {
+        String keycloakId = ((Jwt) authentication.getPrincipal()).getSubject();
+        boolean isManager = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_manager"));
+
+        WorkTask task;
+        if (isManager) {
+            task = workTaskRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("Task", id));
+        } else {
+            Worker worker = workerRepository.findByKeycloakId(keycloakId)
+                    .orElseThrow(() -> new NotFoundException("Worker", keycloakId));
+            task = workTaskRepository.findByIdAndWorkers_Id(id, worker.getId())
+                    .orElseThrow(() -> new NotFoundException("Task", id));
+        }
+
+        return WorkTaskResponse.from(task);
     }
 
     @Transactional
