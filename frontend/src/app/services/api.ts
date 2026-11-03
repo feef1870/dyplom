@@ -29,10 +29,12 @@ export class Api {
     return this.http.get<Worker>(`${BASE_URL}/workers/me`);
   }
 
-  getTasks(search = '', page = 0, size = 10): Observable<Page<Task>> {
-    return this.http.get<Page<Task>>(`${BASE_URL}/tasks`, {
-      params: this.pageParams(search, page, size),
-    });
+  getTasks(search = '', page = 0, size = 10, workStepId?: number): Observable<Page<Task>> {
+    let params = this.pageParams(search, page, size);
+    if (workStepId !== undefined) {
+      params = params.set('workStepId', String(workStepId));
+    }
+    return this.http.get<Page<Task>>(`${BASE_URL}/tasks`, { params });
   }
 
   createTask(body: TaskRequest): Observable<Task> {
@@ -69,6 +71,10 @@ export class Api {
       params = params.set('orderId', String(orderId));
     }
     return this.http.get<Page<WorkStep>>(`${BASE_URL}/steps`, { params });
+  }
+
+  getStep(id: number): Observable<WorkStep> {
+    return this.http.get<WorkStep>(`${BASE_URL}/steps/${id}`);
   }
 
   createStep(body: WorkStepRequest): Observable<WorkStep> {

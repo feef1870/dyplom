@@ -1,0 +1,50 @@
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (step(); as s) {
+  <h1>{{ s.name }}</h1>
+  <p>{{ s.description ?? 'No description.' }}</p>
+  <p>Start date: {{ (s.startDate | date) ?? 'Hasn\'t been started yet' }}</p>
+  <p>End date: {{ (s.endDate | date) ?? 'Hasn\'t been finished yet' }}</p>
+  <p>Status: {{ s.status }}</p>
+} @else {
+  <p>Loading step…</p>
+}
+
+<h2>Tasks</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <input type="text" placeholder="Name" formControlName="name" />
+  <input type="text" placeholder="Description" formControlName="description" />
+  <input type="number" min="0" placeholder="Unit quantity" formControlName="unitQuantity" />
+
+  <select formControlName="priceTagId">
+    <option [ngValue]="null" disabled>Select a price tag…</option>
+    @for (priceTag of priceTags(); track priceTag.id) {
+      <option [ngValue]="priceTag.id">{{ priceTag.name }}</option>
+    }
+  </select>
+
+  <button type="submit" [disabled]="submitting()">Create</button>
+</form>
+
+@if (form.controls.name.touched && form.controls.name.invalid) {
+  <p class="error">Name is required.</p>
+}
+@if (formError()) {
+  <p class="error">{{ formError() }}</p>
+}
+
+<hr />
+
+@if (tasks().length === 0) {
+  <p>No tasks yet.</p>
+} @else {
+  <ul>
+    @for (task of tasks(); track task.id) {
+      <li>
+        <a [routerLink]="['/tasks', task.id]">{{ task.name }}</a>
+        <span class="status">{{ task.status }}</span>
+      </li>
+    }
+  </ul>
+}

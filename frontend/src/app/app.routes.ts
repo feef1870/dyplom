@@ -35,4 +35,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/order-detail-page/order-detail-page').then((m) => m.OrderDetailPage),
   },
+  {
+    path: 'steps/:id',
+    canActivate: [autoLoginPartialRoutesGuard, managerGuard],
+    loadComponent: () =>
+      import('./pages/step-detail-page/step-detail-page').then((m) => m.StepDetailPage),
+  },
 ];
