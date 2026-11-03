@@ -12,6 +12,22 @@
 
 <h2>Steps</h2>
 
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <input type="text" placeholder="Name" formControlName="name" />
+  <input type="text" placeholder="Description" formControlName="description" />
+
+  <button type="submit" [disabled]="submitting()">Create</button>
+</form>
+
+@if (form.controls.name.touched && form.controls.name.invalid) {
+  <p class="error">Name is required.</p>
+}
+@if (formError()) {
+  <p class="error">{{ formError() }}</p>
+}
+
+<hr />
+
 @if (steps().length === 0) {
   <p>No steps yet.</p>
 } @else {
