@@ -21,7 +21,16 @@
   }
 </select>
 <button [disabled]="submitting() || !workerControl.value" (click)="assignWorker(workerControl.value!)">Assign</button>
-<button [disabled]="submitting() || !workerControl.value" (click)="unassignWorker(workerControl.value!)">Unassign</button>
+
+<h3>Assigned workers</h3>
+<div class="workers">
+  @for (worker of assignedWorkers(); track worker.id) {
+    <div class="worker-row">
+      {{ worker.firstName }} {{ worker.lastName }}
+      <button [disabled]="submitting()" (click)="unassignWorker(worker.id)">Unassign</button>
+    </div>
+  }
+</div>
 
 @if (workerControl.touched && workerControl.invalid) {
   <p class="error">Choose a worker</p>

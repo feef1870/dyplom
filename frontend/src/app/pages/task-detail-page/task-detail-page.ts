@@ -23,6 +23,10 @@ export class TaskDetailPage {
     const t = this.task();
     return t ? t.unitQuantity * t.priceSnapshot : 0;
   });
+  assignedWorkers = computed(() => {
+    const t = this.task();
+    return t ? t.workers : undefined;
+  })
 
   workers = signal<Worker[]>([]);
 
@@ -83,10 +87,20 @@ export class TaskDetailPage {
   private success(): void {
     this.workerControl.reset();
     this.submitting.set(false);
+
+    const currentTaskId = this.task()?.id;
+    if (currentTaskId) {
+      this.loadTask(currentTaskId);
+    }
   }
 
   private failure(err: any): void {
     this.formError.set(err?.error?.message ?? 'Something went wrong.');
     this.submitting.set(false);
+
+    const currentTaskId = this.task()?.id;
+    if (currentTaskId) {
+      this.loadTask(currentTaskId);
+    }
   }
 }
