@@ -23,14 +23,18 @@
 <button [disabled]="submitting() || !workerControl.value" (click)="assignWorker(workerControl.value!)">Assign</button>
 
 <h3>Assigned workers</h3>
-<div class="workers">
-  @for (worker of assignedWorkers(); track worker.id) {
-    <div class="worker-row">
-      {{ worker.firstName }} {{ worker.lastName }}
-      <button [disabled]="submitting()" (click)="unassignWorker(worker.id)">Unassign</button>
-    </div>
-  }
-</div>
+@if (assignedWorkers().length === 0) {
+  <p>No workers assigned.</p>
+} @else {
+  <div class="workers">
+    @for (worker of assignedWorkers(); track worker.id) {
+      <div class="worker-row">
+        {{ worker.firstName }} {{ worker.lastName }}
+        <button [disabled]="submitting()" (click)="unassignWorker(worker.id)">Unassign</button>
+      </div>
+    }
+  </div>
+}
 
 @if (workerControl.touched && workerControl.invalid) {
   <p class="error">Choose a worker</p>

@@ -24,9 +24,8 @@ export class TaskDetailPage {
     return t ? t.unitQuantity * t.priceSnapshot : 0;
   });
   assignedWorkers = computed(() => {
-    const t = this.task();
-    return t ? t.workers : undefined;
-  })
+    return this.task()?.workers ?? [];
+  });
 
   workers = signal<Worker[]>([]);
 
