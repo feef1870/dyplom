@@ -41,4 +41,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/step-detail-page/step-detail-page').then((m) => m.StepDetailPage),
   },
+  {
+    path: 'tasks/:id',
+    canActivate: [autoLoginPartialRoutesGuard, managerGuard],
+    loadComponent: () =>
+      import('./pages/task-detail-page/task-detail-page').then((m) => m.TaskDetailPage),
+  },
 ];

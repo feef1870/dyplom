@@ -1,0 +1,35 @@
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (task(); as t) {
+  <h1>{{ t.name }}</h1>
+  <p>{{ t.description ?? 'No description.' }}</p>
+  <p>Start date: {{ (t.startDate | date) ?? 'Hasn\'t been started yet' }}</p>
+  <p>End date: {{ (t.endDate | date) ?? 'Hasn\'t been finished yet' }}</p>
+  <p>Status: {{ t.status }}</p>
+  <p>{{ t.unitQuantity }} units</p>
+  <p>{{ t.priceSnapshot }} per unit</p>
+  <p>Price: {{ calculatedPrice() }}</p>
+} @else {
+  <p>Loading task…</p>
+}
+
+<h2>Assign workers to this task</h2>
+<select [formControl]="workerControl">
+  <option [ngValue]="null" disabled>Select a worker…</option>
+  @for (worker of workers(); track worker.id) {
+    <option [ngValue]="worker.id">{{ worker.firstName }} {{ worker.lastName }}</option>
+  }
+</select>
+<button [disabled]="submitting() || !workerControl.value" (click)="assignWorker(workerControl.value!)">Assign</button>
+<button [disabled]="submitting() || !workerControl.value" (click)="unassignWorker(workerControl.value!)">Unassign</button>
+
+@if (workerControl.touched && workerControl.invalid) {
+  <p class="error">Choose a worker</p>
+}
+@if (formError()) {
+  <p class="error">{{ formError() }}</p>
+}
+
+
+<h2>Reports placeholder</h2>
+<!-- TODO: add report list and creation form -->
