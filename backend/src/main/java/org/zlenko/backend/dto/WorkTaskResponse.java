@@ -5,6 +5,7 @@ import org.zlenko.backend.enums.Status;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 public record WorkTaskResponse(
         Long id,
@@ -15,6 +16,7 @@ public record WorkTaskResponse(
         Status status,
         BigDecimal unitQuantity,
         BigDecimal priceSnapshot,
+        List<WorkerResponse> workers,
         Long workStepId
 ) {
     public static WorkTaskResponse from(WorkTask task) {
@@ -27,6 +29,7 @@ public record WorkTaskResponse(
                 task.getStatus(),
                 task.getUnitQuantity(),
                 task.getPriceSnapshot(),
+                task.getWorkers().stream().map(WorkerResponse::from).toList(),
                 task.getWorkStep().getId()
         );
     }

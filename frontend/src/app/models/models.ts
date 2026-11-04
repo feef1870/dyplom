@@ -29,6 +29,7 @@ export interface Task {
   status: Status;
   unitQuantity: number;
   priceSnapshot: number;
+  workers: Worker[];
   workStepId: number;
 }
 
