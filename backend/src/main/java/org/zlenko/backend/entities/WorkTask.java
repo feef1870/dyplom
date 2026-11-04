@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.zlenko.backend.enums.Status;
@@ -69,6 +70,7 @@ public class WorkTask {
     private PriceTag priceTag;
 
     @ManyToMany(mappedBy = "workTasks")
+    @BatchSize(size = 100)
     private Set<Worker> workers = new HashSet<>();
 
     public void assignWorker(Worker worker) {
