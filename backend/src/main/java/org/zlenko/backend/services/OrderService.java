@@ -13,15 +13,18 @@ import org.zlenko.backend.dto.OrderResponse;
 import org.zlenko.backend.entities.Client;
 import org.zlenko.backend.entities.Order;
 import org.zlenko.backend.enums.Status;
+import org.zlenko.backend.exceptions.ConflictException;
 import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.ClientRepository;
 import org.zlenko.backend.repositories.OrderRepository;
+import org.zlenko.backend.repositories.WorkStepRepository;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
+    private final WorkStepRepository workStepRepository;
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('manager')")
@@ -67,5 +70,37 @@ public class OrderService {
         return OrderResponse.from(orderRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Order", id))
         );
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public OrderResponse startOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order", id));
+
+        if (order.getStatus() != Status.PLANNED) {
+            throw new ConflictException("Order can only be started from PLANNED status");
+        }
+
+        order.setStatus(Status.IN_PROGRESS);
+        return OrderResponse.from(order);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public OrderResponse completeOrder(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order", id));
+
+        if (order.getStatus() != Status.IN_PROGRESS) {
+            throw new ConflictException("Order can only be completed from IN_PROGRESS status");
+        }
+
+        if (workStepRepository.existsByOrder_IdAndStatusNot(id, Status.CLOSED)) {
+            throw new ConflictException("Cannot complete order: not all work steps are closed");
+        }
+
+        order.setStatus(Status.CLOSED);
+        return OrderResponse.from(order);
     }
 }

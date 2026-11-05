@@ -38,5 +38,13 @@ public class WorkStepController {
         return workStepService.createWorkStep(request);
     }
 
+    @PostMapping("/{id}/start")
+    public WorkStepResponse startWorkStep(@PathVariable("id") Long id) {
+        return workStepService.startWorkStep(id);
+    }
 
+    @PostMapping("/{id}/complete")
+    public WorkStepResponse completeWorkStep(@PathVariable("id") Long id) {
+        return workStepService.completeWorkStep(id);
+    }
 }

@@ -59,4 +59,14 @@ public class WorkTaskController {
         return workTaskService.assignWorkerToTask(taskId, workerId);
     }
 
+    @PostMapping("/{id}/start")
+    public WorkTaskResponse startWorkTask(@PathVariable("id") Long id) {
+        return workTaskService.startWorkTask(id);
+    }
+
+    @PostMapping("/{id}/complete")
+    public WorkTaskResponse completeWorkTask(@PathVariable("id") Long id) {
+        return workTaskService.completeWorkTask(id);
+    }
+
 }

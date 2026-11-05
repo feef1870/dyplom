@@ -38,4 +38,14 @@ public class OrderController {
     public OrderResponse getOrder(@PathVariable("id") Long id) {
         return orderService.getOrder(id);
     }
+
+    @PostMapping("/{id}/start")
+    public OrderResponse startOrder(@PathVariable("id") Long id) {
+        return orderService.startOrder(id);
+    }
+
+    @PostMapping("/{id}/complete")
+    public OrderResponse completeOrder(@PathVariable("id") Long id) {
+        return orderService.completeOrder(id);
+    }
 }

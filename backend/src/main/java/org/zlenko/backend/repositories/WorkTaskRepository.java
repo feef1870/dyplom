@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.zlenko.backend.entities.WorkTask;
+import org.zlenko.backend.enums.Status;
 
 import java.util.Optional;
 
@@ -35,4 +36,5 @@ public interface WorkTaskRepository extends JpaRepository<WorkTask, Long> {
     Page<WorkTask> findByWorkers_IdAndWorkStep_IdAndNameContainingIgnoreCase(Long workerId, String name, Long workStepId, Pageable pageable);
 
     Optional<WorkTask> findByIdAndWorkers_Id(Long id, Long workerId);
+    boolean existsByWorkStep_IdAndStatusNot(Long workStepId, Status status);
 }

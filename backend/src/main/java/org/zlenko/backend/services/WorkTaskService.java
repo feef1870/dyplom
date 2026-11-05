@@ -17,11 +17,13 @@ import org.zlenko.backend.entities.WorkStep;
 import org.zlenko.backend.entities.WorkTask;
 import org.zlenko.backend.entities.Worker;
 import org.zlenko.backend.enums.Status;
+import org.zlenko.backend.exceptions.ConflictException;
 import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.PriceTagRepository;
 import org.zlenko.backend.repositories.WorkStepRepository;
 import org.zlenko.backend.repositories.WorkTaskRepository;
 import org.zlenko.backend.repositories.WorkerRepository;
+import java.time.Instant;
 
 
 @Service
@@ -94,6 +96,36 @@ public class WorkTaskService {
                     .orElseThrow(() -> new NotFoundException("Task", id));
         }
 
+        return WorkTaskResponse.from(task);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public WorkTaskResponse startWorkTask(Long id) {
+        WorkTask task = workTaskRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Task", id));
+
+        if (task.getStatus() != Status.PLANNED) {
+            throw new ConflictException("Task can only be started from PLANNED status");
+        }
+
+        task.setStatus(Status.IN_PROGRESS);
+        task.setStartDate(Instant.now());
+        return WorkTaskResponse.from(task);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public WorkTaskResponse completeWorkTask(Long id) {
+        WorkTask task = workTaskRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Task", id));
+
+        if (task.getStatus() != Status.IN_PROGRESS) {
+            throw new ConflictException("Task can only be completed from IN_PROGRESS status");
+        }
+
+        task.setStatus(Status.CLOSED);
+        task.setEndDate(Instant.now());
         return WorkTaskResponse.from(task);
     }
 

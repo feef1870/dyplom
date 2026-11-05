@@ -12,15 +12,19 @@ import org.zlenko.backend.dto.WorkStepResponse;
 import org.zlenko.backend.entities.Order;
 import org.zlenko.backend.entities.WorkStep;
 import org.zlenko.backend.enums.Status;
+import org.zlenko.backend.exceptions.ConflictException;
 import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.OrderRepository;
 import org.zlenko.backend.repositories.WorkStepRepository;
+import org.zlenko.backend.repositories.WorkTaskRepository;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
 public class WorkStepService {
     private final WorkStepRepository workStepRepository;
     private final OrderRepository orderRepository;
+    private final WorkTaskRepository workTaskRepository;
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('manager')")
@@ -64,5 +68,39 @@ public class WorkStepService {
         step.setOrder(order);
 
         return WorkStepResponse.from(workStepRepository.save(step));
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public WorkStepResponse startWorkStep(Long id) {
+        WorkStep step = workStepRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("WorkStep", id));
+
+        if (step.getStatus() != Status.PLANNED) {
+            throw new ConflictException("Work step can only be started from PLANNED status");
+        }
+
+        step.setStatus(Status.IN_PROGRESS);
+        step.setStartDate(Instant.now());
+        return WorkStepResponse.from(step);
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('manager')")
+    public WorkStepResponse completeWorkStep(Long id) {
+        WorkStep step = workStepRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("WorkStep", id));
+
+        if (step.getStatus() != Status.IN_PROGRESS) {
+            throw new ConflictException("Work step can only be completed from IN_PROGRESS status");
+        }
+
+        if (workTaskRepository.existsByWorkStep_IdAndStatusNot(id, Status.CLOSED)) {
+            throw new ConflictException("Cannot complete work step: not all tasks are closed");
+        }
+
+        step.setStatus(Status.CLOSED);
+        step.setEndDate(Instant.now());
+        return WorkStepResponse.from(step);
     }
 }
