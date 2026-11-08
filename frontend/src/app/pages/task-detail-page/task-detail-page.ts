@@ -18,6 +18,7 @@ export class TaskDetailPage {
 
   task = signal<Task | undefined>(undefined);
   error = signal<string | undefined>(undefined);
+  actionError = signal<string | undefined>(undefined);
 
   calculatedPrice = computed(() => {
     const t = this.task();
@@ -31,6 +32,7 @@ export class TaskDetailPage {
 
   formError = signal<string | undefined>(undefined);
   submitting = signal(false);
+  transitioning = signal(false);
 
   workerControl = this.fb.control(null as number | null, Validators.required);
 
@@ -101,5 +103,39 @@ export class TaskDetailPage {
     if (currentTaskId) {
       this.loadTask(currentTaskId);
     }
+  }
+
+  startTask(): void {
+    this.transitioning.set(true);
+    this.actionError.set(undefined);
+
+    this.api.startTask(this.task()!.id).subscribe({
+      next: (task) => {
+        this.transitioning.set(false);
+        this.loadTask(task.id);
+        this.loadReports(task.id);
+      },
+      error: (err) => {
+        this.transitioning.set(false);
+        this.actionError.set(err?.error?.message ?? 'Could not start task.');
+      },
+    });
+  }
+
+  completeTask(): void {
+    this.transitioning.set(true);
+    this.actionError.set(undefined);
+
+    this.api.completeTask(this.task()!.id).subscribe({
+      next: (task) => {
+        this.transitioning.set(false);
+        this.loadTask(task.id);
+        this.loadReports(task.id);
+      },
+      error: (err) => {
+        this.transitioning.set(false);
+        this.actionError.set(err?.error?.message ?? 'Could not complete task.');
+      },
+    });
   }
 }

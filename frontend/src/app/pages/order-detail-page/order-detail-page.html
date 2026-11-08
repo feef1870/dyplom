@@ -3,7 +3,17 @@
 } @else if (order(); as o) {
   <h1>{{ o.name }}</h1>
   <p>{{ o.description ?? 'No description.' }}</p>
-  <p>Status: {{ o.status }}</p>
+  <p>
+    Status: {{ o.status }}
+    @if (o.status === 'PLANNED') {
+      <button type="button" [disabled]="transitioning()" (click)="startOrder()">Start order</button>
+    } @else if (o.status === 'IN_PROGRESS') {
+      <button type="button" [disabled]="transitioning()" (click)="completeOrder()">Complete order</button>
+    }
+    @if (actionError()) {
+      <p class="error">{{ actionError() }}</p>
+    }
+  </p>
   <p>Client: {{ o.clientFirstName }} {{ o.clientLastName }}</p>
   <p>Created: {{ o.createdAt | date }}</p>
 } @else {

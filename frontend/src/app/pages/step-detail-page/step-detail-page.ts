@@ -19,11 +19,13 @@ export class StepDetailPage {
   step = signal<WorkStep | undefined>(undefined);
   tasks = signal<Task[]>([]);
   error = signal<string | undefined>(undefined);
+  actionError = signal<string | undefined>(undefined);
 
   priceTags = signal<PriceTag[]>([]);
 
   formError = signal<string | undefined>(undefined);
   submitting = signal(false);
+  transitioning = signal(false);
 
   form = this.fb.group({
     name: ['', [Validators.required]],
@@ -97,5 +99,39 @@ export class StepDetailPage {
   private saveFailed(err: any): void {
     this.formError.set(err?.error?.message ?? 'Could not create task.');
     this.submitting.set(false);
+  }
+
+  startStep(): void {
+    this.transitioning.set(true);
+    this.actionError.set(undefined);
+
+    this.api.startStep(this.step()!.id).subscribe({
+      next: (step) => {
+        this.transitioning.set(false);
+        this.loadStep(step.id);
+        this.loadTasks(step.id);
+      },
+      error: (err) => {
+        this.transitioning.set(false);
+        this.actionError.set(err?.error?.message ?? 'Could not start step.');
+      },
+    });
+  }
+
+  completeStep(): void {
+    this.transitioning.set(true);
+    this.actionError.set(undefined);
+
+    this.api.completeStep(this.step()!.id).subscribe({
+      next: (step) => {
+        this.transitioning.set(false);
+        this.loadStep(step.id);
+        this.loadTasks(step.id);
+      },
+      error: (err) => {
+        this.transitioning.set(false);
+        this.actionError.set(err?.error?.message ?? 'Could not complete step.');
+      },
+    });
   }
 }

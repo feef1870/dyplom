@@ -124,6 +124,30 @@ export class Api {
     return this.http.post<Client>(`${BASE_URL}/clients`, body);
   }
 
+  startOrder(id: number): Observable<Order> {
+    return this.http.post<Order>(`${BASE_URL}/orders/${id}/start`, null);
+  }
+
+  completeOrder(id: number): Observable<Order> {
+    return this.http.post<Order>(`${BASE_URL}/orders/${id}/complete`, null);
+  }
+
+  startStep(id: number): Observable<WorkStep> {
+    return this.http.post<WorkStep>(`${BASE_URL}/steps/${id}/start`, null);
+  }
+
+  completeStep(id: number): Observable<WorkStep> {
+    return this.http.post<WorkStep>(`${BASE_URL}/steps/${id}/complete`, null);
+  }
+
+  startTask(id: number): Observable<Task> {
+    return this.http.post<Task>(`${BASE_URL}/tasks/${id}/start`, null);
+  }
+
+  completeTask(id: number): Observable<Task> {
+    return this.http.post<Task>(`${BASE_URL}/tasks/${id}/complete`, null);
+  }
+
   private pageParams(search: string, page: number, size: number): HttpParams {
     return new HttpParams()
       .set('search', search)

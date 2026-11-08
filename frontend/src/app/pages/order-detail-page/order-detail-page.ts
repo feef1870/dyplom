@@ -19,9 +19,11 @@ export class OrderDetailPage {
   order = signal<Order | undefined>(undefined);
   steps = signal<WorkStep[]>([]);
   error = signal<string | undefined>(undefined);
+  actionError = signal<string | undefined>(undefined);
 
   formError = signal<string | undefined>(undefined);
   submitting = signal(false);
+  transitioning = signal(false);
 
   form = this.fb.group({
     name: ['', Validators.required],
@@ -83,5 +85,39 @@ export class OrderDetailPage {
   private saveFailed(err: any): void {
     this.formError.set(err?.error?.message ?? 'Could not create step.');
     this.submitting.set(false);
+  }
+
+  startOrder(): void {
+    this.transitioning.set(true);
+    this.actionError.set(undefined);
+
+    this.api.startOrder(this.order()!.id).subscribe({
+      next: (order) => {
+        this.transitioning.set(false);
+        this.loadOrder(order.id);
+        this.loadSteps(order.id);
+      },
+      error: (err) => {
+        this.transitioning.set(false);
+        this.actionError.set(err?.error?.message ?? 'Could not start order.');
+      },
+    });
+  }
+
+  completeOrder(): void {
+    this.transitioning.set(true);
+    this.actionError.set(undefined);
+
+    this.api.completeOrder(this.order()!.id).subscribe({
+      next: (order) => {
+        this.transitioning.set(false);
+        this.loadOrder(order.id);
+        this.loadSteps(order.id);
+      },
+      error: (err) => {
+        this.transitioning.set(false);
+        this.actionError.set(err?.error?.message ?? 'Could not complete order.');
+      },
+    });
   }
 }

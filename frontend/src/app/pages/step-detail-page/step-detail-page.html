@@ -5,7 +5,17 @@
   <p>{{ s.description ?? 'No description.' }}</p>
   <p>Start date: {{ (s.startDate | date) ?? 'Hasn\'t been started yet' }}</p>
   <p>End date: {{ (s.endDate | date) ?? 'Hasn\'t been finished yet' }}</p>
-  <p>Status: {{ s.status }}</p>
+  <p>
+    Status: {{ s.status }}
+    @if (s.status === 'PLANNED') {
+      <button type="button" [disabled]="transitioning()" (click)="startStep()">Start step</button>
+    } @else if (s.status === 'IN_PROGRESS') {
+      <button type="button" [disabled]="transitioning()" (click)="completeStep()">Complete step</button>
+    }
+    @if (actionError()) {
+      <p class="error">{{ actionError() }}</p>
+    }
+  </p>
 } @else {
   <p>Loading step…</p>
 }
