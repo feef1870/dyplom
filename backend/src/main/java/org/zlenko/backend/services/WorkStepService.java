@@ -11,10 +11,12 @@ import org.zlenko.backend.dto.WorkStepRequest;
 import org.zlenko.backend.dto.WorkStepResponse;
 import org.zlenko.backend.entities.Order;
 import org.zlenko.backend.entities.WorkStep;
+import org.zlenko.backend.enums.ReportStatus;
 import org.zlenko.backend.enums.Status;
 import org.zlenko.backend.exceptions.ConflictException;
 import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.OrderRepository;
+import org.zlenko.backend.repositories.WorkReportRepository;
 import org.zlenko.backend.repositories.WorkStepRepository;
 import org.zlenko.backend.repositories.WorkTaskRepository;
 import java.time.Instant;
@@ -25,6 +27,7 @@ public class WorkStepService {
     private final WorkStepRepository workStepRepository;
     private final OrderRepository orderRepository;
     private final WorkTaskRepository workTaskRepository;
+    private final WorkReportRepository workReportRepository;
 
     @Transactional(readOnly = true)
     @PreAuthorize("hasRole('manager')")
@@ -103,6 +106,10 @@ public class WorkStepService {
 
         if (workTaskRepository.existsByWorkStep_IdAndStatusNot(id, Status.CLOSED)) {
             throw new ConflictException("Cannot complete work step: not all tasks are closed");
+        }
+
+        if (workReportRepository.existsByWorkStep_IdAndStatusNot(id, ReportStatus.ACCEPTED)) {
+            throw new ConflictException("Cannot complete work step: not all step reports are accepted");
         }
 
         step.setStatus(Status.CLOSED);

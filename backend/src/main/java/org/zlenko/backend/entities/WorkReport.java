@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import org.zlenko.backend.enums.ReportStatus;
 
 import java.time.Instant;
 
@@ -30,9 +33,16 @@ public class WorkReport {
     @NotBlank(message = "(work reports) comment is null or blank")
     private String comment;
 
-    @Column(name = "is_accepted", nullable = false)
-    @NotNull(message = "(work reports) is accepted is null")
-    private Boolean isAccepted;
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status", nullable = false, columnDefinition = "report_status")
+    @NotNull(message = "(work reports) status is null")
+    private ReportStatus status;
+
+    @Column(name = "feedback")
+    private String feedback;
+
+    @Column(name = "reviewed_at")
+    private Instant reviewedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "work_task_id")

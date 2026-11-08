@@ -17,10 +17,12 @@ import org.zlenko.backend.entities.PriceTag;
 import org.zlenko.backend.entities.WorkStep;
 import org.zlenko.backend.entities.WorkTask;
 import org.zlenko.backend.entities.Worker;
+import org.zlenko.backend.enums.ReportStatus;
 import org.zlenko.backend.enums.Status;
 import org.zlenko.backend.exceptions.ConflictException;
 import org.zlenko.backend.exceptions.NotFoundException;
 import org.zlenko.backend.repositories.PriceTagRepository;
+import org.zlenko.backend.repositories.WorkReportRepository;
 import org.zlenko.backend.repositories.WorkStepRepository;
 import org.zlenko.backend.repositories.WorkTaskRepository;
 import org.zlenko.backend.repositories.WorkerRepository;
@@ -34,6 +36,7 @@ public class WorkTaskService {
     private final PriceTagRepository priceTagRepository;
     private final WorkStepRepository workStepRepository;
     private final WorkerRepository workerRepository;
+    private final WorkReportRepository workReportRepository;
 
     @Transactional(readOnly = true)
     public Page<WorkTaskResponse> getWorkTasks(Authentication authentication, String search, int page, int size, Long workStepId) {
@@ -135,6 +138,14 @@ public class WorkTaskService {
 
         if (task.getStatus() != Status.IN_PROGRESS) {
             throw new ConflictException("Task can only be completed from IN_PROGRESS status");
+        }
+
+        if (!workReportRepository.existsByWorkTask_Id(id)) {
+            throw new ConflictException("Cannot complete task: no reports have been submitted");
+        }
+
+        if (workReportRepository.existsByWorkTask_IdAndStatusNot(id, ReportStatus.ACCEPTED)) {
+            throw new ConflictException("Cannot complete task: not all reports are accepted");
         }
 
         task.setStatus(Status.CLOSED);
