@@ -82,6 +82,12 @@ public class WorkStepService {
 
         step.setStatus(Status.IN_PROGRESS);
         step.setStartDate(Instant.now());
+
+        Order order = step.getOrder();
+        if (order.getStatus() == Status.PLANNED) {
+            order.setStatus(Status.IN_PROGRESS);
+        }
+
         return WorkStepResponse.from(step);
     }
 

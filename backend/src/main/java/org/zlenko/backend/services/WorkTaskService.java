@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zlenko.backend.dto.WorkTaskRequest;
 import org.zlenko.backend.dto.WorkTaskResponse;
+import org.zlenko.backend.entities.Order;
 import org.zlenko.backend.entities.PriceTag;
 import org.zlenko.backend.entities.WorkStep;
 import org.zlenko.backend.entities.WorkTask;
@@ -111,6 +112,18 @@ public class WorkTaskService {
 
         task.setStatus(Status.IN_PROGRESS);
         task.setStartDate(Instant.now());
+
+        WorkStep step = task.getWorkStep();
+        if (step.getStatus() == Status.PLANNED) {
+            step.setStatus(Status.IN_PROGRESS);
+            step.setStartDate(Instant.now());
+        }
+
+        Order order = step.getOrder();
+        if (order.getStatus() == Status.PLANNED) {
+            order.setStatus(Status.IN_PROGRESS);
+        }
+
         return WorkTaskResponse.from(task);
     }
 
