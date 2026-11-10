@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -22,13 +23,14 @@ public class WorkReportController {
 
     @GetMapping
     public Page<WorkReportResponse> getReports(
+            Authentication authentication,
             @RequestParam(required = false) Long taskId,
             @RequestParam(required = false) Long stepId,
             @RequestParam(required = false) ReportStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        return workReportService.getReports(taskId, stepId, status, page, size);
+        return workReportService.getReports(authentication, taskId, stepId, status, page, size);
     }
 
     @GetMapping("/{id}")

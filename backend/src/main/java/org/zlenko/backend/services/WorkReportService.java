@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +37,19 @@ public class WorkReportService {
     private final WorkStepRepository workStepRepository;
 
     @Transactional(readOnly = true)
-    public Page<WorkReportResponse> getReports(Long taskId, Long stepId, ReportStatus status, int page, int size) {
+    public Page<WorkReportResponse> getReports(Authentication authentication, Long taskId, Long stepId, ReportStatus status, int page, int size) {
+        if (status != null) {
+            boolean isSupervisor = authentication.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_supervisor"));
+            if (!isSupervisor) {
+                throw new AccessDeniedException("Only supervisors can list reports by status");
+            }
+
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
+            return workReportRepository.findByStatus(status, pageable)
+                    .map(WorkReportResponse::from);
+        }
+
         Pageable pageable = PageRequest.of(page, size);
 
         if (taskId != null) {
@@ -43,10 +58,6 @@ public class WorkReportService {
         }
         if (stepId != null) {
             return workReportRepository.findByWorkStep_Id(stepId, pageable)
-                    .map(WorkReportResponse::from);
-        }
-        if (status != null) {
-            return workReportRepository.findByStatus(status, pageable)
                     .map(WorkReportResponse::from);
         }
         return workReportRepository.findAll(pageable)

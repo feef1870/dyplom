@@ -15,6 +15,8 @@ public record WorkReportResponse(
         Instant reviewedAt,
         Long workTaskId,
         Long workStepId,
+        String workTaskName,
+        String workStepName,
         Long authorId,
         String authorFirstName,
         String authorLastName
@@ -30,6 +32,8 @@ public record WorkReportResponse(
                 report.getReviewedAt(),
                 report.getWorkTask() != null ? report.getWorkTask().getId() : null,
                 report.getWorkStep() != null ? report.getWorkStep().getId() : null,
+                report.getWorkTask() != null ? report.getWorkTask().getName() : null,
+                report.getWorkStep() != null ? report.getWorkStep().getName() : null,
                 author.getId(),
                 author.getFirstName(),
                 author.getLastName()

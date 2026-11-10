@@ -9,3 +9,11 @@ export const managerGuard: CanActivateFn = () => {
   }
   return inject(Router).createUrlTree(['/']);
 };
+
+export const supervisorGuard: CanActivateFn = () => {
+  const auth = inject(Auth);
+  if (auth.hasRole('supervisor')) {
+    return true;
+  }
+  return inject(Router).createUrlTree(['/']);
+};

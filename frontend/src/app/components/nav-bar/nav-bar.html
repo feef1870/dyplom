@@ -1,7 +1,18 @@
 <nav>
   <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
 
-  <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+  @if (!auth.hasRole('supervisor')) {
+    <a routerLink="/tasks" routerLinkActive="active">Tasks</a>
+  }
+
+  @if (auth.hasRole('supervisor')) {
+    <a routerLink="/reviews" routerLinkActive="active">
+      Review
+      @if (pendingCount() > 0) {
+        <span class="badge">{{ pendingCount() }}</span>
+      }
+    </a>
+  }
 
   @if (auth.hasRole('manager')) {
     <a routerLink="/orders" routerLinkActive="active">Orders</a>

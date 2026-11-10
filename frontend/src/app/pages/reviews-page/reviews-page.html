@@ -1,0 +1,37 @@
+<h1>Pending reviews</h1>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else if (reports().length === 0) {
+  <p>No reports awaiting review.</p>
+} @else {
+  <ul>
+    @for (report of reports(); track report.id) {
+      <li class="report">
+        <p>{{ report.comment }}</p>
+        <p class="meta">
+          {{ report.authorFirstName }} {{ report.authorLastName }} — {{ report.createdAt | date }}
+        </p>
+        @if (report.workTaskId !== null) {
+          <p>Task: <a [routerLink]="['/tasks', report.workTaskId]">{{ report.workTaskName }}</a></p>
+        } @else if (report.workStepId !== null) {
+          <p>Step: {{ report.workStepName }}</p>
+        }
+        <button type="button" (click)="accept(report.id)">Accept</button>
+        <button type="button" (click)="openRejectDialog(report)">Reject</button>
+      </li>
+    }
+  </ul>
+}
+
+@if (totalPages() > 0) {
+  <div class="pagination">
+    <button (click)="prev()" [disabled]="currentPage() === 0">‹ Prev</button>
+    <span>Page {{ currentPage() + 1 }} of {{ totalPages() }}</span>
+    <button (click)="next()" [disabled]="currentPage() >= totalPages() - 1">
+      Next ›
+    </button>
+  </div>
+}

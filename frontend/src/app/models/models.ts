@@ -111,6 +111,8 @@ export interface Report {
   reviewedAt: string | null;
   workTaskId: number | null;
   workStepId: number | null;
+  workTaskName: string | null;
+  workStepName: string | null;
   authorId: number;
   authorFirstName: string;
   authorLastName: string;

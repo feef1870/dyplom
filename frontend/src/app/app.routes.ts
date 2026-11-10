@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { autoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
-import { managerGuard } from './guards/role.guard';
+import { managerGuard, supervisorGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -46,5 +46,10 @@ export const routes: Routes = [
     canActivate: [autoLoginPartialRoutesGuard],
     loadComponent: () =>
       import('./pages/task-detail-page/task-detail-page').then((m) => m.TaskDetailPage),
+  },
+  {
+    path: 'reviews',
+    canActivate: [autoLoginPartialRoutesGuard, supervisorGuard],
+    loadComponent: () => import('./pages/reviews-page/reviews-page').then((m) => m.ReviewsPage),
   },
 ];
