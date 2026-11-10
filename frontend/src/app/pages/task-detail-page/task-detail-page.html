@@ -23,36 +23,70 @@
   <p>Loading task…</p>
 }
 
-<h2>Assign workers to this task</h2>
-<select [formControl]="workerControl">
-  <option [ngValue]="null" disabled>Select a worker…</option>
-  @for (worker of workers(); track worker.id) {
-    <option [ngValue]="worker.id">{{ worker.firstName }} {{ worker.lastName }}</option>
-  }
-</select>
-<button [disabled]="submitting() || !workerControl.value" (click)="assignWorker(workerControl.value!)">Assign</button>
-
-<h3>Assigned workers</h3>
-@if (assignedWorkers().length === 0) {
-  <p>No workers assigned.</p>
-} @else {
-  <div class="workers">
-    @for (worker of assignedWorkers(); track worker.id) {
-      <div class="worker-row">
-        {{ worker.firstName }} {{ worker.lastName }}
-        <button [disabled]="submitting()" (click)="unassignWorker(worker.id)">Unassign</button>
-      </div>
+@if (auth.hasRole('manager')) {
+  <h2>Assign workers to this task</h2>
+  <select [formControl]="workerControl">
+    <option [ngValue]="null" disabled>Select a worker…</option>
+    @for (worker of workers(); track worker.id) {
+      <option [ngValue]="worker.id">{{ worker.firstName }} {{ worker.lastName }}</option>
     }
-  </div>
+  </select>
+  <button [disabled]="submitting() || !workerControl.value" (click)="assignWorker(workerControl.value!)">Assign</button>
+
+  <h3>Assigned workers</h3>
+  @if (assignedWorkers().length === 0) {
+    <p>No workers assigned.</p>
+  } @else {
+    <div class="workers">
+      @for (worker of assignedWorkers(); track worker.id) {
+        <div class="worker-row">
+          {{ worker.firstName }} {{ worker.lastName }}
+          <button [disabled]="submitting()" (click)="unassignWorker(worker.id)">Unassign</button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (workerControl.touched && workerControl.invalid) {
+    <p class="error">Choose a worker</p>
+  }
+  @if (formError()) {
+    <p class="error">{{ formError() }}</p>
+  }
 }
 
-@if (workerControl.touched && workerControl.invalid) {
-  <p class="error">Choose a worker</p>
-}
-@if (formError()) {
-  <p class="error">{{ formError() }}</p>
+<h2>Reports</h2>
+
+@if (!auth.hasRole('supervisor')) {
+  <button type="button" (click)="openReportDialog()">Add report</button>
 }
 
-
-<h2>Reports placeholder</h2>
-<!-- TODO: add report list and creation form -->
+@if (reportsLoading()) {
+  <p>Loading reports…</p>
+} @else if (reportsError()) {
+  <p class="error">{{ reportsError() }}</p>
+} @else if (reports().length === 0) {
+  <p>No reports yet.</p>
+} @else {
+  <ul>
+    @for (report of reports(); track report.id) {
+      <li class="report">
+        <p>{{ report.comment }}</p>
+        <p class="meta">
+          {{ report.authorFirstName }} {{ report.authorLastName }} — {{ report.createdAt | date }}
+        </p>
+        <p>Status: {{ report.status }}</p>
+        @if (report.feedback) {
+          <p>Feedback: {{ report.feedback }}</p>
+        }
+        @if (auth.hasRole('supervisor') && report.status === 'PENDING') {
+          <button type="button" (click)="acceptReport(report.id)">Accept</button>
+          <button type="button" (click)="openRejectDialog(report)">Reject</button>
+        }
+        @if (canEdit(report)) {
+          <button type="button" (click)="openReportDialog(report)">Edit</button>
+        }
+      </li>
+    }
+  </ul>
+}

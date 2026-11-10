@@ -1,4 +1,5 @@
 export type Status = 'PLANNED' | 'IN_PROGRESS' | 'CLOSED';
+export type ReportStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
 
 export interface Page<T> {
   content: T[];
@@ -100,3 +101,32 @@ export interface ClientRequest {
   phone?: string;
   email: string;
 }
+
+export interface Report {
+  id: number;
+  createdAt: string;
+  comment: string;
+  status: ReportStatus;
+  feedback: string | null;
+  reviewedAt: string | null;
+  workTaskId: number | null;
+  workStepId: number | null;
+  authorId: number;
+  authorFirstName: string;
+  authorLastName: string;
+}
+
+export interface ReportRequest {
+  comment: string;
+  workTaskId?: number;
+  workStepId?: number;
+}
+
+export interface UpdateReportRequest {
+  comment: string;
+}
+
+export interface RejectReportRequest {
+  feedback: string;
+}
+

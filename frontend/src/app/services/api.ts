@@ -14,7 +14,12 @@ import {
   Worker,
   Client,
   ClientRequest,
+  Report,
+  ReportRequest,
+  ReportStatus,
+  RejectReportRequest,
   Status,
+  UpdateReportRequest,
 } from '../models/models';
 
 const BASE_URL = 'http://localhost:8080/api';
@@ -122,6 +127,34 @@ export class Api {
 
   createClient(body: ClientRequest): Observable<Client> {
     return this.http.post<Client>(`${BASE_URL}/clients`, body);
+  }
+
+  getReports(taskId?: number, stepId?: number, status?: ReportStatus, page = 0, size = 10): Observable<Page<Report>> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
+    if (taskId !== undefined) params = params.set('taskId', String(taskId));
+    if (stepId !== undefined) params = params.set('stepId', String(stepId));
+    if (status !== undefined) params = params.set('status', String(status));
+    return this.http.get<Page<Report>>(`${BASE_URL}/reports`, { params });
+  }
+
+  getReport(id: number): Observable<Report> {
+    return this.http.get<Report>(`${BASE_URL}/reports/${id}`);
+  }
+
+  createReport(body: ReportRequest): Observable<Report> {
+    return this.http.post<Report>(`${BASE_URL}/reports`, body);
+  }
+
+  updateReport(id: number, body: UpdateReportRequest): Observable<Report> {
+    return this.http.put<Report>(`${BASE_URL}/reports/${id}`, body);
+  }
+
+  acceptReport(id: number): Observable<Report> {
+    return this.http.post<Report>(`${BASE_URL}/reports/${id}/accept`, null);
+  }
+
+  rejectReport(id: number, body: RejectReportRequest): Observable<Report> {
+    return this.http.post<Report>(`${BASE_URL}/reports/${id}/reject`, body);
   }
 
   startOrder(id: number): Observable<Order> {

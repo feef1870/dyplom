@@ -43,7 +43,7 @@ export const routes: Routes = [
   },
   {
     path: 'tasks/:id',
-    canActivate: [autoLoginPartialRoutesGuard, managerGuard],
+    canActivate: [autoLoginPartialRoutesGuard],
     loadComponent: () =>
       import('./pages/task-detail-page/task-detail-page').then((m) => m.TaskDetailPage),
   },
