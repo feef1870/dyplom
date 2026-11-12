@@ -1,10 +1,13 @@
 package org.zlenko.backend.dto;
 
 import org.zlenko.backend.entities.WorkReport;
+import org.zlenko.backend.entities.WorkReportPhoto;
 import org.zlenko.backend.entities.Worker;
 import org.zlenko.backend.enums.ReportStatus;
 
 import java.time.Instant;
+import java.util.Comparator;
+import java.util.List;
 
 public record WorkReportResponse(
         Long id,
@@ -19,7 +22,8 @@ public record WorkReportResponse(
         String workStepName,
         Long authorId,
         String authorFirstName,
-        String authorLastName
+        String authorLastName,
+        List<WorkReportPhotoResponse> photos
 ) {
     public static WorkReportResponse from(WorkReport report) {
         Worker author = report.getAuthor();
@@ -36,7 +40,11 @@ public record WorkReportResponse(
                 report.getWorkStep() != null ? report.getWorkStep().getName() : null,
                 author.getId(),
                 author.getFirstName(),
-                author.getLastName()
+                author.getLastName(),
+                report.getPhotos().stream()
+                        .sorted(Comparator.comparing(WorkReportPhoto::getId))
+                        .map(WorkReportPhotoResponse::from)
+                        .toList()
         );
     }
 }

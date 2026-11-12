@@ -7,12 +7,15 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.zlenko.backend.enums.ReportStatus;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "work_reports")
 @Entity
@@ -56,6 +59,10 @@ public class WorkReport {
     @JoinColumn(name = "author_id")
     @NotNull(message = "(work reports) author id is null")
     private Worker author;
+
+    @OneToMany(mappedBy = "workReport", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 50)
+    private List<WorkReportPhoto> photos = new ArrayList<>();
 
     @AssertTrue(message = "(work reports) exactly one of work task/work step must be set")
     public boolean isExactlyOneReportTarget() {

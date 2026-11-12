@@ -22,6 +22,12 @@ public interface WorkReportRepository extends JpaRepository<WorkReport, Long> {
     @EntityGraph(attributePaths = {"author", "workTask", "workStep"})
     Page<WorkReport> findByStatus(ReportStatus status, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"author", "workTask", "workStep"})
+    Page<WorkReport> findByStatusAndWorkTaskIsNotNull(ReportStatus status, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"author", "workTask", "workStep"})
+    Page<WorkReport> findByStatusAndWorkStepIsNotNull(ReportStatus status, Pageable pageable);
+
     boolean existsByWorkTask_Id(Long workTaskId);
 
     boolean existsByWorkTask_IdAndStatusNot(Long workTaskId, ReportStatus status);
